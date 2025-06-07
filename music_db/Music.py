@@ -60,6 +60,10 @@ class Music:
         """Adds a new user"""
         try:
             cursor = self.connection.cursor()
+            #cursor.execute(
+            #"INSERT IGNORE INTO users (nickname, username, password) VALUES (%s, %s, %s)",
+            #(nickname, username, password)
+        #)
             cursor.execute(
                 "INSERT INTO users (nickname, username, password) VALUES (%s, %s, %s)",
                 (nickname, username, password)
