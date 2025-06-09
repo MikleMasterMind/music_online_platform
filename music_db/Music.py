@@ -94,3 +94,49 @@ class Music:
         """Closes the database connection"""
         if self.connection and self.connection.is_connected():
             self.connection.close()
+
+    def get_user_songs(self, nickname: str) -> List[Tuple]:
+        """Returns all the user's songs"""
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                "SELECT song_name, author FROM songs WHERE nickname = %s",
+                (nickname,)
+            )
+            result = cursor.fetchall()
+            cursor.close()
+            return result
+        except Error as e:
+            print(f"Error when receiving user's songs: {e}")
+            return []
+    
+    def get_all_songs(self) -> List[Tuple]:
+        """Returns all songs with user information"""
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("""
+                SELECT u.username, s.song_name, s.author 
+                FROM songs s
+                JOIN users u ON s.nickname = u.nickname
+            """)
+            result = cursor.fetchall()
+            cursor.close()
+            return result
+        except Error as e:
+            print(f"Error when receiving all songs: {e}")
+            return []
+    
+    def verify_user(self, nickname: str, password: str) -> bool:
+        """Verifies the correctness of the user's password"""
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                "SELECT password FROM users WHERE nickname = %s",
+                (nickname,)
+            )
+            result = cursor.fetchone()
+            cursor.close()
+            return result is not None and result[0] == password
+        except Error as e:
+            print(f"Error when verifying the user: {e}")
+            return False
