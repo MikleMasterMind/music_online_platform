@@ -30,6 +30,18 @@ try:
     db.add_song("jane_smith", "Imagine", "John Lennon")
 
     print("Data added successfully!")
+    #базовая проверка работы дополнительных фичей
+    print("Песни John Doe:")
+    for song in db.get_user_songs("john_doe"):
+        print(f"- {song[0]} by {song[1]}")
+    
+    print("\nПроверка пароля:")
+    print("john_doe с правильным паролем:", db.verify_user("john_doe", "qwerty123"))
+    print("john_doe с неправильным паролем:", db.verify_user("john_doe", "wrong"))
+
+    print("\nВсе песни:")
+    for song in db.get_all_songs():
+        print(f"- {song[1]} by {song[2]} (загрузил: {song[0]})")
 
 except mysql.connector.Error as err:
     print(f"Error: {err}")
