@@ -4,7 +4,6 @@ from PyQt6.QtWidgets import QLineEdit
 from PyQt6.QtWidgets import QVBoxLayout
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtWidgets import QPushButton
-from PyQt6.QtWidgets import QSpacerItem
 from PyQt6.QtWidgets import QHBoxLayout
 from PyQt6.QtWidgets import QListWidget
 from PyQt6.QtMultimedia import QMediaPlayer
@@ -18,7 +17,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
 
         self.setWindowTitle("Misuc player")
-        self.setFixedSize(1000, 800)
+        self.setFixedSize(600, 300)
 
         self.input_music = QLineEdit()
         self.input_music.setPlaceholderText("print music title")
@@ -34,9 +33,9 @@ class MainWindow(QMainWindow):
         self.audio_output = QAudioOutput()
         self.player.setAudioOutput(self.audio_output)
 
-        self.music_files = ["music.mp3"]
+        self.musics = []
         self.music_list = QListWidget()
-        self.music_list.addItems(self.music_files)
+        self.music_list.addItems(self.musics)
         self.music_list.itemClicked.connect(self.set_selected)
         
         list_layout = QHBoxLayout()
@@ -45,8 +44,8 @@ class MainWindow(QMainWindow):
         self.play_btn = QPushButton("Play")
         self.play_btn.clicked.connect(self.play_music)
 
-        self.stop_btn = QPushButton("Stop")
-        self.stop_btn.clicked.connect(self.pause_music)
+        self.pause_btn = QPushButton("Pause")
+        self.pause_btn.clicked.connect(self.pause_music)
 
         self.music_paused = False
 
@@ -56,7 +55,7 @@ class MainWindow(QMainWindow):
         player_layout = QHBoxLayout()
         player_layout.addWidget(self.selected_music_title)
         player_layout.addWidget(self.play_btn)
-        player_layout.addWidget(self.stop_btn)
+        player_layout.addWidget(self.pause_btn)
 
         main_layout = QVBoxLayout()
         main_layout.addLayout(input_layout)
@@ -70,16 +69,14 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
 
     def search_music(self):
-        print(self.input_music.text())
+        file_path = "./test_music/" + "music.mp3"
+        self.musics = {"music.mp3" : QUrl.fromLocalFile(file_path)}
+        self.music_list.clear()
+        self.music_list.addItems(self.musics)
 
     def play_music(self):
-        if self.music_paused:
-            self.music_paused = False
-            self.selected_music_title.setText(self.selected_music)
-            self.player.play()
-        elif self.selected_music:
-            file_path = "./test_music/" + self.selected_music
-            self.player.setSource(QUrl.fromLocalFile(file_path))
+        if self.selected_music:
+            self.player.setSource(self.musics[self.selected_music])
             self.player.play()
 
     def pause_music(self):
@@ -87,6 +84,10 @@ class MainWindow(QMainWindow):
             self.music_paused = True
             self.selected_music_title.setText(f"{self.selected_music}\tpaused")
             self.player.pause()
+        else:
+            self.music_paused = False
+            self.selected_music_title.setText(self.selected_music)
+            self.player.play()
 
     def set_selected(self, item):
         self.selected_music = item.text()
