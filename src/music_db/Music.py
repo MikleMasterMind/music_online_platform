@@ -140,3 +140,13 @@ class Music:
         except Error as e:
             print(f"Error when verifying the user: {e}")
             return False
+    
+    def get_all_regisrtered_users(self) -> set:
+        try:
+            with self.connection.cursor() as cursor:
+                cursor.execute("SELECT nickname FROM users")
+                result = cursor.fetchall()
+                return {row[0] for row in result} if result else set() 
+        except Error as e:
+            print(f"Error when getting all regisrtered users: {e}")
+            return set()
