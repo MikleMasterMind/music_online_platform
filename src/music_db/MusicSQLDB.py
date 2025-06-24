@@ -1,8 +1,8 @@
 import mysql.connector
 from mysql.connector import Error
-from typing import List, Tuple, Optional
+from typing import Any, List, Tuple, Optional
 
-class Music:
+class MusicSQLDB:
     def __init__(self, host: str, user: str, password: str, database: str, auth_plugin: str):
         self.host = host
         self.user = user
@@ -10,6 +10,7 @@ class Music:
         self.database = database
         self.auth_plugin = auth_plugin
         self.connection = None
+        self.registered_users: set  = set()
         self._connect()
         self._create_tables()
 
@@ -94,3 +95,61 @@ class Music:
         """Closes the database connection"""
         if self.connection and self.connection.is_connected():
             self.connection.close()
+
+    def get_user_songs(self, nickname: str) -> List[Tuple]:
+        """Returns all the user's songs"""
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                "SELECT song_name, author FROM songs WHERE nickname = %s",
+                (nickname,)
+            )
+            result = cursor.fetchall()
+            cursor.close()
+            return result
+        except Error as e:
+            print(f"Error when receiving user's songs: {e}")
+            return []
+    
+    def get_all_songs(self) -> List[Tuple]:
+        """Returns all songs with user information"""
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("""
+                SELECT u.username, s.song_name, s.author 
+                FROM songs s
+                JOIN users u ON s.nickname = u.nickname
+            """)
+            result = cursor.fetchall()
+            cursor.close()
+            return result
+        except Error as e:
+            print(f"Error when receiving all songs: {e}")
+            return []
+    
+    def verify_user(self, nickname: str, password: str) -> bool:
+        """Verifies the correctness of the user's password"""
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                "SELECT password FROM users WHERE nickname = %s",
+                (nickname,)
+            )
+            result = cursor.fetchone()
+            cursor.close()
+            return result is not None and result[0] == password
+        except Error as e:
+            print(f"Error when verifying the user: {e}")
+            return False
+    
+    def get_registered_users(self) -> set:
+        return self.registered_users
+    
+    def update_registered_users(self) -> None:
+        try:
+            with self.connection.cursor() as cursor:
+                cursor.execute("SELECT nickname FROM users")
+                result = cursor.fetchall()
+                self.registered_users = {row[0] for row in result} if result else set() 
+        except Error as e:
+            print(f"Error when getting all regisrtered users: {e}")
