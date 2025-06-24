@@ -31,3 +31,6 @@ class SockedWrapper:
 
     def busy(self) -> bool:
         return self.channel_busy
+    
+    def sendraw(self, data: bytes):
+        self.socket.send(data)
