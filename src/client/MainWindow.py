@@ -13,8 +13,10 @@ from PyQt6.QtCore import QBuffer
 from PyQt6.QtCore import QIODevice
 import socket
 from .SockedWrapper import SockedWrapper
+from .AddMusicWindow import AddMusicWindow
 import threading
 import time
+import os
 
 
 class MainWindow(QMainWindow):
@@ -70,10 +72,17 @@ class MainWindow(QMainWindow):
         player_layout.addWidget(self.play_btn)
         player_layout.addWidget(self.pause_btn)
 
+        self.add_music_btn = QPushButton("Add music")
+        self.add_music_btn.clicked.connect(self.show_add_music_window)
+
+        add_music_layout = QHBoxLayout()
+        add_music_layout.addWidget(self.add_music_btn)
+
         main_layout = QVBoxLayout()
         main_layout.addLayout(input_layout)
         main_layout.addLayout(list_layout)
         main_layout.addLayout(player_layout)
+        main_layout.addLayout(add_music_layout)
         main_layout.addStretch()
 
         widget = QWidget()
@@ -124,3 +133,15 @@ class MainWindow(QMainWindow):
             chunk_size = min(chunk_size, size)
             size -= chunk_size
     
+    def show_add_music_window(self):
+        self.add_music_window = AddMusicWindow(self)
+        self.add_music_window.show()
+
+    def add_music(self, path_to_file, title, chunk_size = 4096):
+        self.socket.send("ADD MUSIC {title}")
+        with open(path_to_file, 'rb') as f:
+            filesize = os.path.getsize(path_to_file)
+            self.socket.send(f'{str(filesize)}\n')
+            while chunk := f.read(chunk_size):
+                self.socket.sendraw(chunk)        
+        
