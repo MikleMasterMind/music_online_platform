@@ -2,7 +2,7 @@ import socket
 
 
 class SockedWrapper:
-    def __init__(self, host: str, port: str):
+    def __init__(self, host: str, port: int):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((host, port))
 
