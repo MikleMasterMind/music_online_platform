@@ -1,4 +1,4 @@
-from Music import Music
+from music_db.MusicSQLDB import MusicSQL
 from mysql.connector import Error
 import mysql.connector
 
@@ -13,7 +13,7 @@ if __name__ == "__main__":
     
     
 try:
-    db = Music(**db_config)
+    db = MusicSQL(**db_config)
 
     #базовая проверка работы
     cursor = db.connection.cursor()
