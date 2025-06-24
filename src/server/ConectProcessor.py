@@ -51,6 +51,15 @@ class ConectProcessor:
                     else:
                         answer = "NOT FOUND FILE"
                     return ["TEXT", answer]
+                case ["ADD", "MUSIC", *music_title]:
+                    music_title = f'{" ".join(music_title)}.mp3'.replace(' ', '-') 
+                    if self.musicFile.music_exist(music_title):
+                        i = 1
+                        music_title = f'{music_title}-{i}'
+                        while self.musicFile.music_exist(music_title):
+                            i += 1
+                    self.musicFile.add_music(music_title)
+                    return ["TEXT", f"SAVED {music_title}"]
                 case _:
                     return []
         except Exception as e:
