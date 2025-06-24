@@ -7,7 +7,7 @@ class ConectProcessor:
         self.musicSQL = musicSQL_db  # Объект для работы с БД
         self.musicFile = musicFile_db
         self.logged_users = logged_users  # Ссылка на словарь logged_users из MusicServer
-        self.registered_users = musicSQL_db.get_registered_users()  # Ссылка на множество registered_users из MusicServer
+        # self.registered_users = musicSQL_db.get_registered_users()  # Ссылка на множество registered_users из MusicServer
         #self.logged_in = False
         
 
@@ -38,7 +38,8 @@ class ConectProcessor:
                 #         del self.logged_users[writer]
                 #         return f"Logged out successfully, {username}"
                 #     return "You are not logged in"
-                case ["GET", "MUSIC", music_title]:
+                case ["GET", "MUSIC", *music_title]:
+                    music_title = f'{" ".join(music_title)}.mp3'.replace(' ', '-')
                     if self.musicFile.music_exist(music_title):
                         return self.musicFile.get_music(music_title)
                     else:
