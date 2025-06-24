@@ -11,7 +11,7 @@ class ConectProcessor:
         #self.logged_in = False
         
 
-    async def process_command(self, command, writer):   
+    async def process_command(self, command, writer) -> list:   
         try:
             match command:
                 # case ['registration', username, name, password]:
@@ -41,10 +41,17 @@ class ConectProcessor:
                 case ["GET", "MUSIC", *music_title]:
                     music_title = f'{" ".join(music_title)}.mp3'.replace(' ', '-')
                     if self.musicFile.music_exist(music_title):
-                        return self.musicFile.get_music(music_title)
+                        return ["FILE", self.musicFile.get_music(music_title)]
                     else:
-                        return None
+                        return []
+                case ["FIND", "MUSIC", *music_title]:
+                    music_title = f'{" ".join(music_title)}.mp3'.replace(' ', '-') 
+                    if self.musicFile.music_exist(music_title):
+                        answer = "FOUND FILE"
+                    else:
+                        answer = "NOT FOUND FILE"
+                    return ["TEXT", answer]
                 case _:
-                    return
+                    return []
         except Exception as e:
-            return f"Error: {str(e)}"
+            return [f"Error: {str(e)}"]

@@ -41,11 +41,13 @@ class MusicServer:
                     continue
                 
                 response = await cmdproc.process_command(command, writer)
-                if response:
+                if response[0] == "TEXT":
+                    await self.send_to_user(writer, response[1])
+                elif response[0] == "FILE":
                     await self.send_to_user(writer, "FILE TRANSMIT")
-                    await self.send_file(writer, response)
+                    await self.send_file(writer, response[1])
                 else:
-                    await self.send_to_user(writer, "FILE NOT FOUND")
+                    await self.send_to_user(writer, "ERROR")
 
                 # username = self.logged_users.get(writer)
                     

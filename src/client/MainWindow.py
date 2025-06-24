@@ -14,6 +14,7 @@ from PyQt6.QtCore import QIODevice
 import socket
 from .SockedWrapper import SockedWrapper
 import threading
+import time
 
 
 class MainWindow(QMainWindow):
@@ -84,18 +85,19 @@ class MainWindow(QMainWindow):
         music_title = self.input_music.text()
         self.socket.sendall(f"FIND MUSIC {music_title}\n")
         response = self.socket.readline()
-        if response == "FOUND MUSIC":
+        if response == "FOUND FILE":
             self.music_list.addItem(music_title)
             self.status_output.setText("success")
         else:
             self.status_output.setText("not success")
             
     def play_music(self):
-        if self.selected_music:
+        if self.selected_music and not self.socket.busy():
             self.socket.sendall(f"GET MUSIC {self.selected_music}\n")
             response = self.socket.readline()
             if response == "FILE TRANSMIT":
                 threading.Thread(target=self.receive_stream).start()
+                time.sleep(0.1)
                 self.player.setSourceDevice(self.music_buffer, QUrl("audio/mp3"))
                 self.player.play()
 
