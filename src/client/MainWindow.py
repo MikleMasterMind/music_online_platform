@@ -10,6 +10,7 @@ from PyQt6.QtMultimedia import QMediaPlayer
 from PyQt6.QtMultimedia import QAudioOutput
 from PyQt6.QtCore import QUrl
 from PyQt6.QtCore import QBuffer
+from PyQt6.QtCore import QIODevice
 import socket
 from .SockedWrapper import SockedWrapper
 import threading
@@ -44,6 +45,7 @@ class MainWindow(QMainWindow):
         self.music_list.itemClicked.connect(self.set_selected)
         
         self.music_buffer = QBuffer()
+        self.music_buffer.open(QIODevice.OpenModeFlag.ReadWrite)
         
         list_layout = QHBoxLayout()
         list_layout.addWidget(self.music_list)
@@ -77,14 +79,16 @@ class MainWindow(QMainWindow):
 
     def search_music(self):
         music_title = self.input_music.text()
-        self.socket.sendall(f"GET MUSIC {music_title}")
+        self.socket.sendall(f"GET MUSIC {music_title}\n")
         response = self.socket.readline()
-        if response == "MUSIC TRANSMIT":
+        if response == "FILE TRANSMIT":
             self.music_list.addItem(music_title)
-            threading.Thread(target=self.receive_stream)
+            threading.Thread(target=self.receive_stream).start()
+            self.selected_music = music_title
             
     def play_music(self):
         if self.selected_music:
+            print(self.music_buffer.buffer())
             self.player.setSourceDevice(self.music_buffer, QUrl("audio/mp3"))
             self.player.play()
 
@@ -108,4 +112,6 @@ class MainWindow(QMainWindow):
         while size > 0:
             chunk = self.socket.recv(chunk_size)
             self.music_buffer.write(chunk)
+            chunk_size = min(chunk_size, size)
+            size -= chunk_size
     
