@@ -28,11 +28,14 @@ class MainWindow(QMainWindow):
         self.input_music = QLineEdit()
         self.input_music.setPlaceholderText("print music title")
 
+        self.status_output = QLabel("")
+
         self.search_btn =QPushButton("Search")
         self.search_btn.clicked.connect(self.search_music)
 
         input_layout = QHBoxLayout()
         input_layout.addWidget(self.input_music)
+        input_layout.addWidget(self.status_output)
         input_layout.addWidget(self.search_btn)
 
         self.player = QMediaPlayer()
@@ -79,18 +82,22 @@ class MainWindow(QMainWindow):
 
     def search_music(self):
         music_title = self.input_music.text()
-        self.socket.sendall(f"GET MUSIC {music_title}\n")
+        self.socket.sendall(f"FIND MUSIC {music_title}\n")
         response = self.socket.readline()
-        if response == "FILE TRANSMIT":
+        if response == "FOUND MUSIC":
             self.music_list.addItem(music_title)
-            threading.Thread(target=self.receive_stream).start()
-            self.selected_music = music_title
+            self.status_output.setText("success")
+        else:
+            self.status_output.setText("not success")
             
     def play_music(self):
         if self.selected_music:
-            print(self.music_buffer.buffer())
-            self.player.setSourceDevice(self.music_buffer, QUrl("audio/mp3"))
-            self.player.play()
+            self.socket.sendall(f"GET MUSIC {self.selected_music}\n")
+            response = self.socket.readline()
+            if response == "FILE TRANSMIT":
+                threading.Thread(target=self.receive_stream).start()
+                self.player.setSourceDevice(self.music_buffer, QUrl("audio/mp3"))
+                self.player.play()
 
     def pause_music(self):
         if not self.music_paused:
