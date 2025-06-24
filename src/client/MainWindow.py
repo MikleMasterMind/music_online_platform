@@ -9,12 +9,17 @@ from PyQt6.QtWidgets import QListWidget
 from PyQt6.QtMultimedia import QMediaPlayer
 from PyQt6.QtMultimedia import QAudioOutput
 from PyQt6.QtCore import QUrl
+from PyQt6.QtCore import QBuffer
+import socket
+from .SockedWrapper import SockedWrapper
+import threading
 
 
 class MainWindow(QMainWindow):
-
-    def __init__(self):
+    def __init__(self, socket: SockedWrapper):
         super(MainWindow, self).__init__()
+
+        self.socket = socket
 
         self.setWindowTitle("Misuc player")
         self.setFixedSize(600, 300)
@@ -37,6 +42,8 @@ class MainWindow(QMainWindow):
         self.music_list = QListWidget()
         self.music_list.addItems(self.musics)
         self.music_list.itemClicked.connect(self.set_selected)
+        
+        self.music_buffer = QBuffer()
         
         list_layout = QHBoxLayout()
         list_layout.addWidget(self.music_list)
@@ -69,14 +76,16 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
 
     def search_music(self):
-        file_path = "./test_music/" + "music.mp3"
-        self.musics = {"music.mp3" : QUrl.fromLocalFile(file_path)}
-        self.music_list.clear()
-        self.music_list.addItems(self.musics)
-
+        music_title = self.input_music.text()
+        self.socket.sendall(f"GET MUSIC {music_title}")
+        response = self.socket.readline()
+        if response == "MUSIC TRANSMIT":
+            self.music_list.addItem(music_title)
+            threading.Thread(target=self.receive_stream)
+            
     def play_music(self):
         if self.selected_music:
-            self.player.setSource(self.musics[self.selected_music])
+            self.player.setSourceDevice(self.music_buffer, QUrl("audio/mp3"))
             self.player.play()
 
     def pause_music(self):
@@ -92,3 +101,11 @@ class MainWindow(QMainWindow):
     def set_selected(self, item):
         self.selected_music = item.text()
         self.selected_music_title.setText(self.selected_music)
+
+    def receive_stream(self):
+        size = int(self.socket.readline())
+        chunk_size = 4096
+        while size > 0:
+            chunk = self.socket.recv(chunk_size)
+            self.music_buffer.write(chunk)
+    
