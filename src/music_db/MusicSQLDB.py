@@ -1,8 +1,8 @@
 import mysql.connector
 from mysql.connector import Error
-from typing import List, Tuple, Optional
+from typing import Any, List, Tuple, Optional
 
-class Music:
+class MusicSQLDB:
     def __init__(self, host: str, user: str, password: str, database: str, auth_plugin: str):
         self.host = host
         self.user = user
@@ -10,6 +10,7 @@ class Music:
         self.database = database
         self.auth_plugin = auth_plugin
         self.connection = None
+        self.registered_users: set  = set()
         self._connect()
         self._create_tables()
 
@@ -141,12 +142,14 @@ class Music:
             print(f"Error when verifying the user: {e}")
             return False
     
-    def get_all_regisrtered_users(self) -> set:
+    def get_registered_users(self) -> set:
+        return self.registered_users
+    
+    def update_registered_users(self) -> None:
         try:
             with self.connection.cursor() as cursor:
                 cursor.execute("SELECT nickname FROM users")
                 result = cursor.fetchall()
-                return {row[0] for row in result} if result else set() 
+                self.registered_users = {row[0] for row in result} if result else set() 
         except Error as e:
             print(f"Error when getting all regisrtered users: {e}")
-            return set()
