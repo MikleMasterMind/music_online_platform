@@ -17,5 +17,6 @@ class MusicFileDB:
 
         filename = f"{self.path_to_mp3}/{music_title}"
         with open(filename, 'rb') as f:
+            yield f'{os.path.getsize(filename)}\n'.encode()
             while chunk := f.read(chunk_size):
                 yield chunk
