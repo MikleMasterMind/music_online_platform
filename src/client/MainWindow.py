@@ -92,7 +92,7 @@ class MainWindow(QMainWindow):
 
     def search_music(self):
         music_title = self.input_music.text()
-        self.socket.sendall(f"FIND MUSIC {music_title}\n")
+        self.socket.sendall(f"FIND FILE {music_title}\n")
         response = self.socket.readline()
         if response == "FOUND FILE":
             self.music_list.addItem(music_title)
@@ -102,7 +102,7 @@ class MainWindow(QMainWindow):
             
     def play_music(self):
         if self.selected_music and not self.socket.busy():
-            self.socket.sendall(f"GET MUSIC {self.selected_music}\n")
+            self.socket.sendall(f"GET FILE {self.selected_music}\n")
             response = self.socket.readline()
             if response == "FILE TRANSMIT":
                 threading.Thread(target=self.receive_stream).start()
@@ -127,7 +127,7 @@ class MainWindow(QMainWindow):
     def receive_stream(self):
         size = int(self.socket.readline())
         chunk_size = 4096
-        while size > 0:
+        while size >= 0:
             chunk = self.socket.recv(chunk_size)
             self.music_buffer.write(chunk)
             chunk_size = min(chunk_size, size)
@@ -138,7 +138,7 @@ class MainWindow(QMainWindow):
         self.add_music_window.show()
 
     def add_music(self, path_to_file, title, chunk_size = 4096):
-        self.socket.send("ADD MUSIC {title}")
+        self.socket.send(f"ADD FILE {title}\n")
         with open(path_to_file, 'rb') as f:
             filesize = os.path.getsize(path_to_file)
             self.socket.send(f'{str(filesize)}\n')

@@ -7,6 +7,7 @@ class MusicFileDB:
         files = os.listdir(path_to_mp3)
         mp3_files_only = [f for f in files if os.path.isfile(os.path.join(self.path_to_mp3, f)) and f[len(f) - 3:] == 'mp3']
         self.music_lst = set(mp3_files_only)
+        self.opened_file = None
     
     def music_exist(self, music_title):
         return music_title in self.music_lst
@@ -20,3 +21,15 @@ class MusicFileDB:
             yield f'{os.path.getsize(filename)}\n'.encode()
             while chunk := f.read(chunk_size):
                 yield chunk
+
+    def init_file(self, music_title):
+        filename = f"{self.path_to_mp3}/{music_title}"
+        self.opened_file = open(filename, 'wb')
+        self.music_lst.add(music_title)
+    
+    def write_data(self, data):
+        if self.opened_file:
+            self.opened_file.write(data)
+    
+    def close_file(self):
+        self.opened_file = None
