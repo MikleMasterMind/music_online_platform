@@ -6,7 +6,7 @@ class ConectProcessor:
     def __init__(self, musicSQL_db, musicFile_db, logged_users):
         self.musicSQL = musicSQL_db  # Объект для работы с БД
         self.musicFile = musicFile_db
-        self.logged_users = logged_users  # Ссылка на словарь logged_users из MusicServer
+        # self.logged_users = logged_users  # Ссылка на словарь logged_users из MusicServer
         # self.registered_users = musicSQL_db.get_registered_users()  # Ссылка на множество registered_users из MusicServer
         #self.logged_in = False
         
@@ -38,29 +38,35 @@ class ConectProcessor:
                 #         del self.logged_users[writer]
                 #         return f"Logged out successfully, {username}"
                 #     return "You are not logged in"
-                case ["GET", "MUSIC", *music_title]:
+                case ["GET", "FILE", *music_title]:
                     music_title = f'{" ".join(music_title)}.mp3'.replace(' ', '-')
                     if self.musicFile.music_exist(music_title):
                         return ["FILE", self.musicFile.get_music(music_title)]
                     else:
                         return []
-                case ["FIND", "MUSIC", *music_title]:
+                case ["FIND", "FILE", *music_title]:
                     music_title = f'{" ".join(music_title)}.mp3'.replace(' ', '-') 
                     if self.musicFile.music_exist(music_title):
                         answer = "FOUND FILE"
                     else:
                         answer = "NOT FOUND FILE"
                     return ["TEXT", answer]
-                case ["ADD", "MUSIC", *music_title]:
+                case ["ADD", "FILE", *music_title]:
                     music_title = f'{" ".join(music_title)}.mp3'.replace(' ', '-') 
                     if self.musicFile.music_exist(music_title):
                         i = 1
                         music_title = f'{music_title}-{i}'
                         while self.musicFile.music_exist(music_title):
                             i += 1
-                    self.musicFile.add_music(music_title)
-                    return ["TEXT", f"SAVED {music_title}"]
+                    self.musicFile.init_file(music_title)
+                    return ["GET", "FILE"]
                 case _:
                     return []
         except Exception as e:
             return [f"Error: {str(e)}"]
+    
+    def write_to_file(self, data):
+        self.musicFile.write_data(data)
+    
+    def close_file_conn(self):
+        self.musicFile.close_file()

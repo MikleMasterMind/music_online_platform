@@ -37,17 +37,29 @@ class MusicServer:
         try:
             while not reader.at_eof():
                 command = shlex.split((await reader.readline()).decode().strip())
+                print(f'{command=}')
                 if not command:
                     continue
                 
                 response = await cmdproc.process_command(command, writer)
+                print(f'{response=}')
+                if len(response) == 0:
+                    await self.send_to_user(writer, "ERROR")
                 if response[0] == "TEXT":
                     await self.send_to_user(writer, response[1])
                 elif response[0] == "FILE":
                     await self.send_to_user(writer, "FILE TRANSMIT")
                     await self.send_file(writer, response[1])
-                else:
-                    await self.send_to_user(writer, "ERROR")
+                elif response[0] == "GET":
+                    size = int((await reader.readline()).decode().strip())
+                    print(f'{size=}')
+                    chunk_size = 4096
+                    while size >= 0:
+                        chunk = await reader.read(chunk_size)
+                        cmdproc.write_to_file(chunk)
+                        chunk = min(chunk_size, size)
+                        size -= chunk_size
+                    cmdproc.close_file_conn()
 
                 # username = self.logged_users.get(writer)
                     
