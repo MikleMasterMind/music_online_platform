@@ -20,8 +20,6 @@ Database
 .. automodule:: src.music_db.MusicFileDB
    :members:
 
-.. automodule:: src.music_db.MusicSQLDB
-   :members:
 
 Server
 ------
