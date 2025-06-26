@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "music_online_platform"
+version = "0.1.0"
+authors = [
+    { name = "Mihail", email = "mihuil_00@mail.ru" },
+    { name = "portholl", email = "s02220028@gse.cs.msu.ru" }
+]
+description = "My awesome package"
+readme = "README.md"
+requires-python = ">=3.13"
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "babel==2.17.0; python_version >= '3.8'",
+    "build==1.2.2.post1; python_version >= '3.8'",
+    "mysql-connector-python==9.3.0; python_version >= '3.9'",
+    "packaging==25.0; python_version >= '3.8'",
+    "pyproject-hooks==1.2.0; python_version >= '3.7'",
+    "pyqt6==6.9.1; python_version >= '3.9'",
+    "pyqt6-qt6==6.9.1",
+    "pyqt6-sip==13.10.2; python_version >= '3.9'",
+    "tk==0.1.0",
+    "cloudpickle==3.1.1; python_version >= '3.8'",
+    "doit==0.36.0; python_version >= '3.8'",
+    "importlib-metadata==8.7.0; python_version >= '3.9'", 
+    "zipp==3.23.0; python_version >= '3.9'",
+]
+
+[project.urls]
+Homepage = "https://github.com/MikleMasterMind/music_online_platform"
+
+[tool.setuptools]
+packages = ["server", "music_db", "client"] 
+package-dir = { "" = "src" }
+
+[tool.setuptools.package-data]
+my_package = ["Pipfile*", "l10n/*", "*.pot", "src/music_db/data/*"] 
