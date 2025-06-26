@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+
+<html lang="en, ru" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>src.music_db.MusicFileDB &#8212; MUSIC_PLATFORM 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../../_static/documentation_options.js?v=fb911c68"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for src.music_db.MusicFileDB</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;File storage handler for music files in MP3 format.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+
+<div class="viewcode-block" id="MusicFileDB">
+<a class="viewcode-back" href="../../../api.html#src.music_db.MusicFileDB.MusicFileDB">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MusicFileDB</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Handles storage and retrieval of music files in a directory.</span>
+
+<span class="sd">    Provides methods for:</span>
+<span class="sd">    - Checking file existence</span>
+<span class="sd">    - Streaming music files</span>
+<span class="sd">    - Writing new music files</span>
+<span class="sd">    - Managing file operations</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path_to_mp3</span> <span class="o">=</span> <span class="s2">&quot;./music_db/data&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the music file database with specified directory.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            path_to_mp3: Path to directory containing MP3 files.</span>
+<span class="sd">                        Defaults to &#39;./music_db/data&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_to_mp3</span> <span class="o">=</span> <span class="n">path_to_mp3</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path_to_mp3</span><span class="p">)</span>
+        <span class="n">mp3_files_only</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_mp3</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span> <span class="ow">and</span> <span class="n">f</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">-</span> <span class="mi">3</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;mp3&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">music_lst</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">mp3_files_only</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opened_file</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="MusicFileDB.music_exist">
+<a class="viewcode-back" href="../../../api.html#src.music_db.MusicFileDB.MusicFileDB.music_exist">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">music_exist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">music_title</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a music file exists in the database.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">music_title</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">music_lst</span></div>
+
+
+<div class="viewcode-block" id="MusicFileDB.get_music">
+<a class="viewcode-back" href="../../../api.html#src.music_db.MusicFileDB.MusicFileDB.get_music">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_music</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">music_title</span><span class="p">,</span> <span class="n">chunk_size</span> <span class="o">=</span> <span class="mi">4096</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate that yields chunks of a music file for streaming.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            music_title: Name of the music file to stream</span>
+<span class="sd">            chunk_size: Size of data chunks to yield (default 4096)</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            bytes: Chunks of the music file data</span>
+<span class="sd">            str: File size as first yielded value</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None: If requested file doesn&#39;t exist</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">music_title</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">music_lst</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_mp3</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">music_title</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+            <span class="k">while</span> <span class="n">chunk</span> <span class="o">:=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">chunk_size</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">chunk</span></div>
+
+
+<div class="viewcode-block" id="MusicFileDB.init_file">
+<a class="viewcode-back" href="../../../api.html#src.music_db.MusicFileDB.MusicFileDB.init_file">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">music_title</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a new music file for writing.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            music_title: Name of the new music file (with .mp3 extension)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_mp3</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">music_title</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opened_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">music_lst</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">music_title</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MusicFileDB.write_data">
+<a class="viewcode-back" href="../../../api.html#src.music_db.MusicFileDB.MusicFileDB.write_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write data to the currently open music file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data: Data to write to the file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">opened_file</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">opened_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MusicFileDB.close_file">
+<a class="viewcode-back" href="../../../api.html#src.music_db.MusicFileDB.MusicFileDB.close_file">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">close_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Close the currently open music file.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opened_file</span> <span class="o">=</span> <span class="kc">None</span></div>
+</div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">MUSIC_PLATFORM</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">MUSIC_PLATFORM Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, Belnitskaya Elizaveta, Efanov Mikhail.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
