@@ -37,7 +37,6 @@ class MusicServer:
         try:
             while not reader.at_eof():
                 command = shlex.split((await reader.readline()).decode().strip())
-                print(f'{command=}')
                 if not command:
                     continue
                 

@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import QLineEdit
 from PyQt6.QtWidgets import QPushButton
 from PyQt6.QtWidgets import QLabel
 from PyQt6.QtWidgets import QVBoxLayout
+from . import _
 import os
 
 
@@ -12,18 +13,18 @@ class AddMusicWindow(QWidget):
 
         self.parentWindow = parentWindow
 
-        self.setWindowTitle("Add Music")
+        self.setWindowTitle(_("Add Music"))
         self.setFixedSize(300, 200)
 
         self.input_path = QLineEdit()
-        self.input_path.setPlaceholderText("print path to music file")
+        self.input_path.setPlaceholderText(_("print path to music file"))
 
         self.input_title = QLineEdit()
-        self.input_title.setPlaceholderText("print music title")
+        self.input_title.setPlaceholderText(_("print music title"))
 
         self.output_lbl = QLabel()
 
-        self.add_btn = QPushButton("Add")
+        self.add_btn = QPushButton(_("Add"))
         self.add_btn.clicked.connect(self.add_music)
 
         main_layout = QVBoxLayout()
@@ -36,7 +37,7 @@ class AddMusicWindow(QWidget):
 
     def add_music(self):
         if not os.path.exists(self.input_path.text()):
-            self.output_lbl.setText("File not exist")
+            self.output_lbl.setText(_("File not exist"))
         else:
             self.parentWindow.add_music(self.input_path.text(), self.input_title.text())
-            self.output_lbl.setText("File send to server")
+            self.output_lbl.setText(_("File send to server"))
