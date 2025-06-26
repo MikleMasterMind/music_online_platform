@@ -1,14 +1,11 @@
 import unittest
 import socket
-import threading
 import time
 import asyncio
 from src.server.MusicServer import MusicServer
 from src.music_db.MusicFileDB import MusicFileDB
-
+from src.server import __main__
 import multiprocessing
-import os
-import signal
 
 
 class TestMusicServerReal(unittest.TestCase):
@@ -18,35 +15,15 @@ class TestMusicServerReal(unittest.TestCase):
     def setUpClass(cls):
         """Start the server in a separate thread"""
         server = MusicServer(None, MusicFileDB(path_to_mp3 = "./src/music_db/data"), host='0.0.0.0', port=1337)
-
-        cls.proc = multiprocessing.Process(target= asyncio.run, args= (server.start(),))
+        cls.proc = multiprocessing.Process(target=__main__.start)
         cls.proc.start()
         time.sleep(1)
         cls.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         cls.socket.connect(('localhost', 1337))
 
-
-    @classmethod
-    def run_server(cls):
-        """Run the server in an event loop"""
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        
-        # Setup signal handlers
-        signal.signal(signal.SIGTERM, loop.stop())
-        
-        server = MusicServer(None, None, host='localhost', port=1337)
-        try:
-            loop.run_until_complete(server.start())
-        except asyncio.CancelledError:
-            pass
-        finally:
-            loop.close()
-
     @classmethod
     def tearDownClass(cls):
         """Clean up server"""
-        print("HERE")
         cls.socket.close()
         time.sleep(0.5)
         cls.socket.close()
