@@ -1,3 +1,4 @@
+"""Sub window for adding new music to server db."""
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtWidgets import QLineEdit
 from PyQt6.QtWidgets import QPushButton
@@ -8,7 +9,20 @@ import os
 
 
 class AddMusicWindow(QWidget):
+    """Sub window for adding new music to server db.
+
+    Window contains:
+            2 QLineEdit feilds for music path and music title,
+            1 QLabel for status,
+            1 QPushButton to do action
+    """
+
     def __init__(self, parentWindow):
+        """Initialize window.
+
+        Args:
+            parenwWindow: window wich contains this window
+        """
         super().__init__()
 
         self.parentWindow = parentWindow
@@ -36,6 +50,7 @@ class AddMusicWindow(QWidget):
         self.setLayout(main_layout)
 
     def add_music(self):
+        """Fun send from user input to server."""
         if not os.path.exists(self.input_path.text()):
             self.output_lbl.setText(_("File not exist"))
         else:

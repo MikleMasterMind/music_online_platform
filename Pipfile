@@ -9,6 +9,9 @@ pyqt6 = "*"
 mysql-connector-python = "*"
 babel = "*"
 build = "*"
+doit = "*"
+pydocstyle = "*"
+flake8 = "*"
 
 [dev-packages]
 

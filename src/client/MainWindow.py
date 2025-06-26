@@ -1,3 +1,4 @@
+"""Main window for app."""
 from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtWidgets import QLabel
 from PyQt6.QtWidgets import QLineEdit
@@ -20,7 +21,29 @@ import os
 
 
 class MainWindow(QMainWindow):
+    """Main window for listening music.
+
+    Window contains:
+        Search layout:
+            QLineEdit for music to search
+            QLabel for status
+            QPushButton to send search
+        List layout:
+            QListWidget to show found musics
+        Player Layout:
+            QLabel to show current music and pause mode
+            QPushButton to start play music from begin
+            QPushButton to pause and contine music
+        Add Music Layout:
+            QPushButton to open sudwindow for adding new music
+    """
+
     def __init__(self, socket: SockedWrapper):
+        """Initialiaze window.
+
+        Args:
+            socket: connected to server socket
+        """
         super(MainWindow, self).__init__()
 
         self.socket = socket
@@ -33,7 +56,7 @@ class MainWindow(QMainWindow):
 
         self.status_output = QLabel("")
 
-        self.search_btn =QPushButton(_("Search"))
+        self.search_btn = QPushButton(_("Search"))
         self.search_btn.clicked.connect(self.search_music)
 
         input_layout = QHBoxLayout()
@@ -49,10 +72,10 @@ class MainWindow(QMainWindow):
         self.music_list = QListWidget()
         self.music_list.addItems(self.musics)
         self.music_list.itemClicked.connect(self.set_selected)
-        
+
         self.music_buffer = QBuffer()
         self.music_buffer.open(QIODevice.OpenModeFlag.ReadWrite)
-        
+
         list_layout = QHBoxLayout()
         list_layout.addWidget(self.music_list)
 
@@ -91,6 +114,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
 
     def search_music(self):
+        """Fun to send searc-query to server."""
         music_title = self.input_music.text()
         self.socket.sendall(f"FIND FILE {music_title}\n")
         response = self.socket.readline()
@@ -99,8 +123,9 @@ class MainWindow(QMainWindow):
             self.status_output.setText(_("success"))
         else:
             self.status_output.setText(_("not success"))
-            
+
     def play_music(self):
+        """Fun to get music from server and start plaing."""
         if self.selected_music and not self.socket.busy():
             self.socket.sendall(f"GET FILE {self.selected_music}\n")
             response = self.socket.readline()
@@ -111,6 +136,7 @@ class MainWindow(QMainWindow):
                 self.player.play()
 
     def pause_music(self):
+        """Fun to pause music."""
         if not self.music_paused:
             self.music_paused = True
             self.selected_music_title.setText(f"{self.selected_music}\t{_('paused')}")
@@ -121,10 +147,12 @@ class MainWindow(QMainWindow):
             self.player.play()
 
     def set_selected(self, item):
+        """Fun to select music from list."""
         self.selected_music = item.text()
         self.selected_music_title.setText(self.selected_music)
 
     def receive_stream(self):
+        """Fun read stream data from socket and write it to buffer."""
         size = int(self.socket.readline())
         chunk_size = 4096
         while size >= 0:
@@ -132,16 +160,17 @@ class MainWindow(QMainWindow):
             self.music_buffer.write(chunk)
             chunk_size = min(chunk_size, size)
             size -= chunk_size
-    
+
     def show_add_music_window(self):
+        """Fun to show subwindow to add music."""
         self.add_music_window = AddMusicWindow(self)
         self.add_music_window.show()
 
     def add_music(self, path_to_file, title, chunk_size = 4096):
+        """Fun write music from file to socket."""
         self.socket.send(f"ADD FILE {title}\n")
         with open(path_to_file, 'rb') as f:
             filesize = os.path.getsize(path_to_file)
             self.socket.send(f'{str(filesize)}\n')
             while chunk := f.read(chunk_size):
-                self.socket.sendraw(chunk)        
-        
+                self.socket.sendraw(chunk)

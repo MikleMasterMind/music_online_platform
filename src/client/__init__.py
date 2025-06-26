@@ -1,3 +1,4 @@
+"""Init locales."""
 import gettext
 import locale
 
@@ -10,7 +11,9 @@ LOCALES = {
     ("en_US", "UTF-8"): gettext.NullTranslations(),
 }
 
+
 def _(text: str) -> str:
     return LOCALES[locale.getlocale()].gettext(text)
+
 
 locale.setlocale(locale.LC_ALL, ("ru_RU", "UTF-8"))

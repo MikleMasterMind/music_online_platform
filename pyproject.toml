@@ -24,7 +24,11 @@ dependencies = [
     "pyqt6==6.9.1; python_version >= '3.9'",
     "pyqt6-qt6==6.9.1",
     "pyqt6-sip==13.10.2; python_version >= '3.9'",
-    "tk==0.1.0", 
+    "tk==0.1.0",
+    "cloudpickle==3.1.1; python_version >= '3.8'",
+    "doit==0.36.0; python_version >= '3.8'",
+    "importlib-metadata==8.7.0; python_version >= '3.9'", 
+    "zipp==3.23.0; python_version >= '3.9'",
 ]
 
 [project.urls]
