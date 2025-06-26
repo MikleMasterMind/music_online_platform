@@ -1,4 +1,3 @@
-import shutil
 from pathlib import Path
 from doit.tools import config_changed
 
@@ -17,9 +16,22 @@ DOIT_CONFIG = {
 }
 
 def task_all():
+    """Generate main generators."""
     return {
         'actions': [],
-        'task_dep': ['html', 'i18n'],
+        'task_dep': ['html', 'i18n', 'docstyle', "codstyle"],
+    }
+
+def task_docstyle():
+    """Check dos style."""
+    return {
+        'actions': ['pydocstyle ./src']
+    }
+    
+def task_codstyle():
+    """Check code style."""
+    return {
+        'actions': ['flake8 ./src']
     }
 
 def task_html():
