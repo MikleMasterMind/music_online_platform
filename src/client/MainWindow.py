@@ -11,9 +11,9 @@ from PyQt6.QtMultimedia import QAudioOutput
 from PyQt6.QtCore import QUrl
 from PyQt6.QtCore import QBuffer
 from PyQt6.QtCore import QIODevice
-import socket
 from .SockedWrapper import SockedWrapper
 from .AddMusicWindow import AddMusicWindow
+from . import _
 import threading
 import time
 import os
@@ -25,15 +25,15 @@ class MainWindow(QMainWindow):
 
         self.socket = socket
 
-        self.setWindowTitle("Misuc player")
+        self.setWindowTitle(_("Misuc player"))
         self.setFixedSize(600, 300)
 
         self.input_music = QLineEdit()
-        self.input_music.setPlaceholderText("print music title")
+        self.input_music.setPlaceholderText(_("print music title"))
 
         self.status_output = QLabel("")
 
-        self.search_btn =QPushButton("Search")
+        self.search_btn =QPushButton(_("Search"))
         self.search_btn.clicked.connect(self.search_music)
 
         input_layout = QHBoxLayout()
@@ -56,10 +56,10 @@ class MainWindow(QMainWindow):
         list_layout = QHBoxLayout()
         list_layout.addWidget(self.music_list)
 
-        self.play_btn = QPushButton("Play")
+        self.play_btn = QPushButton(_("Play"))
         self.play_btn.clicked.connect(self.play_music)
 
-        self.pause_btn = QPushButton("Pause")
+        self.pause_btn = QPushButton(_("Pause"))
         self.pause_btn.clicked.connect(self.pause_music)
 
         self.music_paused = False
@@ -72,7 +72,7 @@ class MainWindow(QMainWindow):
         player_layout.addWidget(self.play_btn)
         player_layout.addWidget(self.pause_btn)
 
-        self.add_music_btn = QPushButton("Add music")
+        self.add_music_btn = QPushButton(_("Add music"))
         self.add_music_btn.clicked.connect(self.show_add_music_window)
 
         add_music_layout = QHBoxLayout()
@@ -96,9 +96,9 @@ class MainWindow(QMainWindow):
         response = self.socket.readline()
         if response == "FOUND FILE":
             self.music_list.addItem(music_title)
-            self.status_output.setText("success")
+            self.status_output.setText(_("success"))
         else:
-            self.status_output.setText("not success")
+            self.status_output.setText(_("not success"))
             
     def play_music(self):
         if self.selected_music and not self.socket.busy():
@@ -113,7 +113,7 @@ class MainWindow(QMainWindow):
     def pause_music(self):
         if not self.music_paused:
             self.music_paused = True
-            self.selected_music_title.setText(f"{self.selected_music}\tpaused")
+            self.selected_music_title.setText(f"{self.selected_music}\t{_('paused')}")
             self.player.pause()
         else:
             self.music_paused = False

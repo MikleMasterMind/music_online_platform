@@ -1,0 +1,71 @@
+# Translations template for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-06-26 12:46+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: client/AddMusicWindow.py:16
+msgid "Add Music"
+msgstr ""
+
+#: client/AddMusicWindow.py:20
+msgid "print path to music file"
+msgstr ""
+
+#: client/AddMusicWindow.py:23 client/MainWindow.py:33
+msgid "print music title"
+msgstr ""
+
+#: client/AddMusicWindow.py:27
+msgid "Add"
+msgstr ""
+
+#: client/AddMusicWindow.py:40
+msgid "File not exist"
+msgstr ""
+
+#: client/AddMusicWindow.py:43
+msgid "File send to server"
+msgstr ""
+
+#: client/MainWindow.py:29
+msgid "Misuc player"
+msgstr ""
+
+#: client/MainWindow.py:37
+msgid "Search"
+msgstr ""
+
+#: client/MainWindow.py:60
+msgid "Play"
+msgstr ""
+
+#: client/MainWindow.py:63
+msgid "Pause"
+msgstr ""
+
+#: client/MainWindow.py:76
+msgid "Add music"
+msgstr ""
+
+#: client/MainWindow.py:100
+msgid "success"
+msgstr ""
+
+#: client/MainWindow.py:102
+msgid "not success"
+msgstr ""
+
