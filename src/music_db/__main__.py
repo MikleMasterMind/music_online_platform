@@ -1,8 +1,11 @@
+"""Database testing and demonstration script for MusicSQL class."""
+
 from music_db.MusicSQLDB import MusicSQL
-from mysql.connector import Error
 import mysql.connector
 
 if __name__ == "__main__":
+    """Main execution block for database testing."""
+
     db_config = {
         'host': 'localhost',
         'user': 'music_user',
@@ -10,12 +13,12 @@ if __name__ == "__main__":
         'database': 'music_db',
         'auth_plugin': 'mysql_native_password'
     }
-    
-    
+
+
 try:
     db = MusicSQL(**db_config)
 
-    #базовая проверка работы
+    # базовая проверка работы
     cursor = db.connection.cursor()
     cursor.execute("DELETE FROM songs WHERE nickname IN ('john_doe', 'jane_smith')")
     cursor.execute("DELETE FROM users WHERE nickname IN ('john_doe', 'jane_smith')")
@@ -30,11 +33,11 @@ try:
     db.add_song("jane_smith", "Imagine", "John Lennon")
 
     print("Data added successfully!")
-    #базовая проверка работы дополнительных фичей
+    # базовая проверка работы дополнительных фичей
     print("Песни John Doe:")
     for song in db.get_user_songs("john_doe"):
         print(f"- {song[0]} by {song[1]}")
-    
+
     print("\nПроверка пароля:")
     print("john_doe с правильным паролем:", db.verify_user("john_doe", "qwerty123"))
     print("john_doe с неправильным паролем:", db.verify_user("john_doe", "wrong"))
@@ -46,5 +49,5 @@ try:
 except mysql.connector.Error as err:
     print(f"Error: {err}")
 finally:
-        if 'db' in locals():
-            db.close()
+    if 'db' in locals():
+        db.close()

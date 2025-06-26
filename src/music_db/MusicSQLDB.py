@@ -1,21 +1,41 @@
+"""Database handler for music application using MySQL."""
+
 import mysql.connector
 from mysql.connector import Error
-from typing import Any, List, Tuple, Optional
+from typing import List, Tuple
+
 
 class MusicSQLDB:
+    """Handles all database operations for the music application.
+
+    Manages connections to MySQL database and provides methods for:
+    - User registration and authentication
+    - Song management
+    - Data retrieval
+    """
+
     def __init__(self, host: str, user: str, password: str, database: str, auth_plugin: str):
+        """Initialize database connection and setup required tables.
+
+        Args:
+            host: MySQL server host address
+            user: Database username
+            password: Database password
+            database: Name of the database to connect to
+            auth_plugin: Authentication plugin to use
+        """
         self.host = host
         self.user = user
         self.password = password
         self.database = database
         self.auth_plugin = auth_plugin
         self.connection = None
-        self.registered_users: set  = set()
+        self.registered_users: set = set()
         self._connect()
         self._create_tables()
 
     def _connect(self):
-        """Establishes a connection with MySQL"""
+        """Establish a connection with MySQL."""
         try:
             self.connection = mysql.connector.connect(
                 host=self.host,
@@ -28,10 +48,10 @@ class MusicSQLDB:
             raise
 
     def _create_tables(self):
-        """Creates the users and songs tables if they do not exist"""
+        """Create the users and songs tables if they do not exist."""
         try:
             cursor = self.connection.cursor()
-            
+
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS users (
                     nickname VARCHAR(50) PRIMARY KEY,
@@ -39,7 +59,7 @@ class MusicSQLDB:
                     password VARCHAR(100) NOT NULL
                 )
             """)
-            
+
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS songs (
                     song_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -50,7 +70,7 @@ class MusicSQLDB:
                     ON DELETE CASCADE
                 )
             """)
-            
+
             self.connection.commit()
             cursor.close()
         except Error as e:
@@ -58,13 +78,9 @@ class MusicSQLDB:
             raise
 
     def add_user(self, nickname: str, username: str, password: str) -> bool:
-        """Adds a new user"""
+        """Add a new user."""
         try:
             cursor = self.connection.cursor()
-            #cursor.execute(
-            #"INSERT IGNORE INTO users (nickname, username, password) VALUES (%s, %s, %s)",
-            #(nickname, username, password)
-        #)
             cursor.execute(
                 "INSERT INTO users (nickname, username, password) VALUES (%s, %s, %s)",
                 (nickname, username, password)
@@ -77,7 +93,7 @@ class MusicSQLDB:
             return False
 
     def add_song(self, nickname: str, song_name: str, author: str) -> bool:
-        """Adds a new song"""
+        """Add a new song."""
         try:
             cursor = self.connection.cursor()
             cursor.execute(
@@ -90,14 +106,14 @@ class MusicSQLDB:
         except Error as e:
             print(f"Error when adding a song: {e}")
             return False
-    
+
     def close(self):
-        """Closes the database connection"""
+        """Close the database connection if it's open."""
         if self.connection and self.connection.is_connected():
             self.connection.close()
 
     def get_user_songs(self, nickname: str) -> List[Tuple]:
-        """Returns all the user's songs"""
+        """Retrieve all songs belonging to a specific user."""
         try:
             cursor = self.connection.cursor()
             cursor.execute(
@@ -110,13 +126,13 @@ class MusicSQLDB:
         except Error as e:
             print(f"Error when receiving user's songs: {e}")
             return []
-    
+
     def get_all_songs(self) -> List[Tuple]:
-        """Returns all songs with user information"""
+        """Retrieve all songs in the database with user information."""
         try:
             cursor = self.connection.cursor()
             cursor.execute("""
-                SELECT u.username, s.song_name, s.author 
+                SELECT u.username, s.song_name, s.author
                 FROM songs s
                 JOIN users u ON s.nickname = u.nickname
             """)
@@ -126,9 +142,9 @@ class MusicSQLDB:
         except Error as e:
             print(f"Error when receiving all songs: {e}")
             return []
-    
+
     def verify_user(self, nickname: str, password: str) -> bool:
-        """Verifies the correctness of the user's password"""
+        """Verify if provided credentials match a user in database."""
         try:
             cursor = self.connection.cursor()
             cursor.execute(
@@ -141,15 +157,17 @@ class MusicSQLDB:
         except Error as e:
             print(f"Error when verifying the user: {e}")
             return False
-    
+
     def get_registered_users(self) -> set:
+        """Get set of all registered user nicknames."""
         return self.registered_users
-    
+
     def update_registered_users(self) -> None:
+        """Update internal set of registered users from database."""
         try:
             with self.connection.cursor() as cursor:
                 cursor.execute("SELECT nickname FROM users")
                 result = cursor.fetchall()
-                self.registered_users = {row[0] for row in result} if result else set() 
+                self.registered_users = {row[0] for row in result} if result else set()
         except Error as e:
             print(f"Error when getting all regisrtered users: {e}")
