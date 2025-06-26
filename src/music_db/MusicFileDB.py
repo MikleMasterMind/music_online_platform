@@ -4,6 +4,8 @@ import os
 class MusicFileDB:
     def __init__(self, path_to_mp3 = "./music_db/data"):
         self.path_to_mp3 = path_to_mp3
+        if not os.path.exists(path_to_mp3):
+            os.makedirs(path_to_mp3)
         files = os.listdir(path_to_mp3)
         mp3_files_only = [f for f in files if os.path.isfile(os.path.join(self.path_to_mp3, f)) and f[len(f) - 3:] == 'mp3']
         self.music_lst = set(mp3_files_only)
