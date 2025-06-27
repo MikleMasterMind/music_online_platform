@@ -69,7 +69,6 @@ class MusicServer:
                     await self.send_file(writer, response[1])
                 elif response[0] == "GET":
                     size = int((await reader.readline()).decode().strip())
-                    print(f'{size=}')
                     chunk_size = 4096
                     while size >= 0:
                         chunk = await reader.read(chunk_size)
