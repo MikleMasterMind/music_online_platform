@@ -23,6 +23,12 @@ def task_all():
         'task_dep': ['html', 'i18n', 'docstyle', "codstyle"],
     }
 
+def task_wheel():
+    """Generate wheel."""
+    return {
+        'actions': ['python -m build --wheel']
+    }
+
 def task_test():
     """Run all tests from the tests directory"""
     test_files = glob.glob("tests/*.py")
