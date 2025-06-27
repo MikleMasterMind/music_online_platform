@@ -118,8 +118,9 @@ class MainWindow(QMainWindow):
         music_title = self.input_music.text()
         self.socket.sendall(f"FIND FILE {music_title}\n")
         response = self.socket.readline()
+        print(response)
         if response == "FOUND FILE":
-            self.music_list.addItem(music_title)
+            self.music_list.insertItem(0, music_title)
             self.status_output.setText(_("success"))
         else:
             self.status_output.setText(_("not success"))
@@ -153,9 +154,10 @@ class MainWindow(QMainWindow):
 
     def receive_stream(self):
         """Fun read stream data from socket and write it to buffer."""
+        self.music_buffer.reset()
         size = int(self.socket.readline())
         chunk_size = 4096
-        while size >= 0:
+        while size > 0:
             chunk = self.socket.recv(chunk_size)
             self.music_buffer.write(chunk)
             chunk_size = min(chunk_size, size)

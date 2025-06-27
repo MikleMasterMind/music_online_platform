@@ -1,4 +1,5 @@
 from pathlib import Path
+import glob
 from doit.tools import config_changed
 
 SPHINX_SOURCE = "docs"
@@ -20,6 +21,14 @@ def task_all():
     return {
         'actions': [],
         'task_dep': ['html', 'i18n', 'docstyle', "codstyle"],
+    }
+
+def task_test():
+    """Run all tests from the tests directory"""
+    test_files = glob.glob("tests/*.py")
+    print(test_files)
+    return {
+        'actions': [f"python -m unittest {file}" for file in test_files]
     }
 
 def task_docstyle():
